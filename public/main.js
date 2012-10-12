@@ -47,6 +47,8 @@ function render_snapshot(snapshot) {
 		if (!$unit.size()) {
 			$battlefield.append(unit_template(unit));
 			$unit = $(id);
+		} else {
+			$unit.replaceWith(unit_template(unit));
 		}
 	});
 

@@ -49,13 +49,23 @@ Simulation.prototype.findWinner = function () {
 	return groups.length < 2;
 };
 
+Simulation.prototype.findUnit = function (id) {
+	if (id < 0 || id > this.units_.length) {
+		return null;
+	}
+	return this.units_[id];
+};
 
 Simulation.prototype.doActionAttack = function (unit, target_id) {
 	console.debug(target_id);
 };
 
 Simulation.prototype.doActionEngage = function (unit, target_id) {
-	console.debug(target_id);
+	var target = this.findUnit(target_id);
+	if (!target || !target.isEngagable()) {
+		throw new Error('Target `'+target_id+'` can\'t be engage.');
+	}
+	unit.engage(target_id);
 };
 
 Simulation.prototype.doAction = function (unit, action) {
