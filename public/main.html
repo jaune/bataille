@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr" lang="fr" dir="ltr">
+	<head>
+		<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />    
+		<title>Exemple</title>
+		<style type="text/css">
+			html, body {
+				margin: 0;
+				padding: 0;
+			}
+
+			.unit {
+				margin: 3px;
+				padding: 3px;
+			}
+
+			.unit .skills {
+				display: none;
+			}
+
+			.unit.active {
+				background: #f0f;
+			}
+			
+			#controls {
+				border: 1px solid #000;
+				margin: 3px;
+				padding: 3px;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="controls">
+			<div>Cycle: <span id="cycle">0</span></div>
+			<div>Action: <input id="action" type="text" /></div>
+			<div><button id="step">Step</button></div>
+		</div>
+		<div id="battlefield"></div>
+
+
+		<script id="unit-template" type="text/x-handlebars-template">
+			<div id="unit{{id}}" data-id="{{id}}" title="{{name}} ({{group}})" class="unit">
+				<div>{{name}} ({{group}})</div>
+				<div>Santé : {{health}}</div>
+			</div>
+		</script>
+
+
+		<script src="Unit.js"></script>
+		<script src="Simulation.js"></script>
+
+
+		<script src="handlebars.js"></script>
+		<script src="zepto.js"></script>
+		<script src="main.js"></script>
+	</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "author": "jaune",
+  "name": "bataille",
+  "description": "Battle simulatior.",
+  "version": "0.0.0",
+  "dependencies": {
+    "express" : "*"
+  },
+  "devDependencies": {},
+  "optionalDependencies": {},
+  "engines": {
+    "node": "*"
+  }
+}
