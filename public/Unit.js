@@ -4,6 +4,7 @@ var Unit = function (id, name, group) {
 	this.group_ = group;
 
 	this.health_ = 100;
+	this.attack_ = 10;
 
 	this.engage_ = null;
 
@@ -14,30 +15,51 @@ var Unit = function (id, name, group) {
 
 
 Unit.prototype.omniscientSnap = function () {
+	var engage_id = null;
+	if (this.engage_) {
+		engage_id = this.engage_.id_;
+	}
+
 	return {
 		id : this.id_,
 		name : this.name_,
 		group : this.group_,
 		position : this.position_,
 		health : this.health_,
-		engage : this.engage_
+		engage : engage_id
 	};
 };
 
 Unit.prototype.subjectiveSnap = function () {
+	var engage_id = null;
+	if (this.engage_) {
+		engage_id = this.engage_.id_;
+	}
+
 	return {
 		id : this.id_,
 		name : this.name_,
 		group : this.group_,
 		position : this.position_,
 		health : this.health_,
-		engage : this.engage_
+		engage : engage_id
 	};
 };
 
-Unit.prototype.engage = function (unit_id) {
-	this.engage_ = unit_id;
+Unit.prototype.engage = function (target) {
+	if (!target.isEngagable()) {
+		throw new Error('Target can\'t be engage.');
+	}
+	this.engage_ = target;
 };
+
+Unit.prototype.attack = function (target) {
+	if (this.engage_ !== target) {
+		throw new Error('Target must be engage.');
+	}
+	target.health_ -= this.attack_;
+};
+
 
 Unit.prototype.isActivable = function () {
 	return this.isAlive();

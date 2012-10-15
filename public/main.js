@@ -8,8 +8,13 @@ simulation.createUnit({
 });
 
 simulation.createUnit({
-	name: 'Chevalier noir',
-	group: 'Méchant'
+	name: 'Paladin',
+	group: 'Gentil'
+});
+
+simulation.createUnit({
+	name: 'Paladin',
+	group: 'Gentil'
 });
 
 simulation.createUnit({
@@ -32,8 +37,16 @@ render_snapshot(simulation.snap());
 $('#step').on('click', function () {
 
 	var action = $('#action').val();
+	var target_id = $('#target').val();
 	$('#action').val('');
-	simulation.step(action);
+	$('#target').val('');
+
+	var target = simulation.findUnit(target_id);
+	if (!target) {
+		throw new Error('Missing target `'+target_id+'`.');
+	}
+
+	simulation.step(action, target);
 	render_snapshot(simulation.snap());
 });
 
@@ -41,6 +54,7 @@ function render_snapshot(snapshot) {
 	$('#cycle').html(snapshot.cycle);
 	$battlefield = $('#battlefield');
 
+	$('#target').html('<option value="">-</option>');
 	snapshot.units.forEach(function (unit) {
 		var id = '#unit'+unit.id;
 		$unit = $(id);
@@ -50,6 +64,8 @@ function render_snapshot(snapshot) {
 		} else {
 			$unit.replaceWith(unit_template(unit));
 		}
+	
+		$('#target').append('<option value="'+unit.id+'">'+unit.name +' ('+unit.group+') #'+unit.id+'</option>');
 	});
 
 	$('.unit').removeClass('active');

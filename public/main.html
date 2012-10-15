@@ -2,12 +2,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr" lang="fr" dir="ltr">
 	<head>
 		<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />    
-		<title>Exemple</title>
+		<title>Bataille</title>
 		<style type="text/css">
-			html, body {
-				margin: 0;
-				padding: 0;
-			}
 
 			.unit {
 				margin: 3px;
@@ -33,17 +29,27 @@
 
 		<div id="controls">
 			<div>Cycle: <span id="cycle">0</span></div>
-			<div>Action: <input id="action" type="text" /></div>
+			<div>
+				<span>Action:</span>
+				<select id="action">
+					<option value="">-</option>
+					<option value="engage">Engage</option>
+					<option value="attack">Attack</option>
+				</select>
+				<span>Target:</span>
+				<select id="target"></select>
+			</div>
 			<div><button id="step">Step</button></div>
 		</div>
 		<div id="battlefield"></div>
 
 
 		<script id="unit-template" type="text/x-handlebars-template">
-			<div id="unit{{id}}" data-id="{{id}}" title="{{name}} ({{group}})" class="unit">
-				<div>{{id}} : {{name}} ({{group}})</div>
+			<div id="unit{{id}}" data-id="{{id}}" title="{{name}} ({{group}}) #{{id}}" class="unit">
+				<div>{{name}} ({{group}}) #{{id}}</div>
 				<div>Santé : {{health}}</div>
-				<div>Engagé avec : {{engage}}</div>
+				<div>Position : {{position}}</div>
+				<div>Engagé avec : #{{engage}}</div>
 			</div>
 		</script>
 

@@ -56,33 +56,7 @@ Simulation.prototype.findUnit = function (id) {
 	return this.units_[id];
 };
 
-Simulation.prototype.doActionAttack = function (unit, target_id) {
-	console.debug(target_id);
-};
-
-Simulation.prototype.doActionEngage = function (unit, target_id) {
-	var target = this.findUnit(target_id);
-	if (!target || !target.isEngagable()) {
-		throw new Error('Target `'+target_id+'` can\'t be engage.');
-	}
-	unit.engage(target_id);
-};
-
-Simulation.prototype.doAction = function (unit, action) {
-	var matches = /(attack ([0-9]+))|(engage ([0-9]+))/g.exec(action);
-	if (!matches) {
-		throw new Error('Invalid action `'+action+'`.');
-	}
-	if (matches[1]) {
-		this.doActionAttack(unit, matches[2]);
-	} else if (matches[3]) {
-		this.doActionEngage(unit,matches[4]);
-	} else {
-		throw new Error('Invalid action `'+action+'`.');
-	}
-};
-
-Simulation.prototype.step = function (action) {
+Simulation.prototype.step = function (action, target) {
 	if (this.units_.length < 2) {
 		throw new Error('Need units.');
 	}
@@ -92,7 +66,14 @@ Simulation.prototype.step = function (action) {
 	}
 	var current = this.findActive();
 
-	this.doAction(current, action);
+	switch (action) {
+		case 'attack' :
+			current.attack(target);
+		break;
+		case 'engage' :
+			current.engage(target);
+		break;
+	}
 
 	this.cycle_++;
 	if (current) {
