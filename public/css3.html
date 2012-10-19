@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="fr" lang="fr" dir="ltr">
+	<head>
+		<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+		<title>Bataille</title>
+		<style type="text/css">
+			html, body {
+				margin: 0;
+				padding: 0;
+
+				background: #000;
+
+				overflow: hidden;
+
+			}
+
+			.viewer {
+				position: relative;
+
+				width: 500px;
+				height: 500px;
+
+				overflow: hidden;
+
+				text-align: center;
+			}
+
+			.battlefield {
+				position: absolute;
+
+				top: 50%;
+				left: 50%;
+
+
+
+/*
+				-webkit-transform-origin: center center;
+				-webkit-transform: scale(0.5);
+*/
+				font-size: 0;
+			}
+
+			.group {
+				width: 200px;
+
+				position: absolute;
+
+				top: 0;
+				left: -100px;
+
+				border: 3px dashed #fff;
+				margin: 3px;
+				padding: 3px;
+			}
+
+			.conflict {
+				position: absolute;
+			}
+
+			.group .rear {
+				background: #333;
+			}
+
+			.group .front,
+			.group .rear {
+				text-align: center;
+			}
+
+			.unit {
+				display: inline-block;
+				width: 16px;
+				height: 13px;
+				background: #f0f;
+
+				border: none;
+				border-top: 3px solid #fff;
+
+				margin: 3px;
+
+			}
+
+			.conflict .unit {
+				position: absolute;
+			}
+
+/*			
+			.group .unit.active,
+			.group .unit.hover,
+			.group .unit:hover {
+				width: 10px;
+				height: 10px;
+			}
+
+			.group .unit.hover,
+			.group .unit:hover {
+				border: 3px solid #eee;
+			}
+
+			.unit.active {
+				border: 3px solid #fff;
+			}
+*/
+			.unit.blue {
+				background: #00f;
+			}
+
+			.unit.red {
+				background: #f00;
+			}
+
+			.unit.green {
+				background: #0f0;
+			}
+		</style>
+	</head>
+	<body>
+	
+		<div class="viewer">
+			<div class="battlefield">
+				<div class="group">
+					<div class="front">
+						<div class="unit red"></div>
+						<div class="unit red"></div>
+					</div>
+				</div>
+				<div class="group">
+					<div class="front">
+						<div class="unit blue"></div>
+						<div class="unit blue active"></div>
+						<div class="unit blue"></div>
+						<div class="unit blue"></div>
+						<div class="unit blue"></div>
+						<div class="unit blue"></div>
+					</div>
+					<div class="rear">
+						<div class="unit blue"></div>
+						<div class="unit blue"></div>
+					</div>
+				</div>
+				<div class="group">
+					<div class="front">
+						<div class="unit green"></div>
+						<div class="unit green"></div>
+					</div>
+				</div>
+
+				<div class="conflict">
+
+					<div id="unit0" class="unit red" data-target="#unit1"></div>
+					<div id="unit4" class="unit red" data-target="#unit1"></div>
+					<div id="unit5" class="unit red" data-target="#unit1"></div>
+				
+					<div id="unit1" class="unit green" data-target="#unit0"></div>
+					<div id="unit2" class="unit green" data-target="#unit0"></div>
+					<div id="unit3" class="unit green" data-target="#unit0"></div>
+
+					<div id="unit6" class="unit blue" data-target="#unit5"></div>
+					<div id="unit7" class="unit blue" data-target="#unit5"></div>
+					<div id="unit8" class="unit blue" data-target="#unit5"></div>
+					<div id="unit9" class="unit blue" data-target="#unit5"></div>
+					<div id="unit10" class="unit blue" data-target="#unit5"></div>
+				</div>
+			</div>
+		</div>
+
+		<script type="text/javascript" src="zepto.js"></script>
+		<script type="text/javascript">
+			 $('.battlefield').each(function () {
+
+			 	var $battlefield = $(this),
+			 		$groups = $battlefield.find('.group'),
+			 		groups_space = 360 / $groups.size();
+			 		
+				
+				$groups.each(function (i) {
+					$(this).css({
+						'-webkit-transform-origin' : 'top center',
+						'-webkit-transform' : 'rotateZ('+(i * groups_space)+'deg) translateY(120px)'
+					});
+				});
+
+				var ordered_targets = [];
+
+				$('.conflict > .unit').each(function () {
+					var unit = {};
+					var $unit = $(this);
+					var target = $unit.attr('data-target');
+					var id = $unit.attr('id');
+
+					unit.$unit = $unit;
+					unit.$edges = $('.conflict > .unit[data-target="#'+id+'"], '+target);
+					unit.$attackers = $('.conflict > .unit[data-target="#'+id+'"]');
+					unit.$target = $(target);
+
+					ordered_targets.push(unit);
+				});
+
+				ordered_targets.sort(function (a, b) {
+					return b.$edges.size() - a.$edges.size();
+				});
+
+				var root_count = 0;
+				$.each(ordered_targets, function () {
+					var path = this.$unit.data('path') || root_count++;
+					this.$unit.data('path', path);
+
+					var parent_path = path;
+					var edges_count = this.$edges.size();
+					this.$edges.each(function (j) {
+						var $edge = $(this),
+							path = $edge.data('path') || parent_path+'/'+((j/edges_count) * 360);
+						$edge.data('path', path);
+					});
+				});
+
+				$.each(ordered_targets, function () {
+					var path = this.$unit.data('path');
+					console.debug(this.$unit.attr('id'), this.$edges.size(), path);
+
+					this.$unit.css({
+						'-webkit-transform-origin' : 'center center',
+						'-webkit-transform' : path_to_transform(path)
+					})
+				});
+
+				function path_to_transform(path) {
+					var parts = path.split('/'),
+						parts_count = parts.length,
+						transform = '';
+
+					$.each(parts, function (i) {
+						var alpha = (this*1);
+						var y = 32;
+						if (i === 0) {
+							alpha = (alpha / root_count) * 360;
+							y *= root_count;
+						}
+						transform += ' rotateZ('+(alpha + ((i + 1 + i) * 180))+'deg) translateY('+y+'px) ';
+					});
+
+					return transform;
+				}
+
+				/*
+					$target = $(this);
+					
+					$attackers = $('.conflict > .unit[data-target="#'+$target.attr('id')+'"]');
+					var attackers_count = $attackers.size(),
+						attackers_space = 360 / attackers_count;
+
+						
+
+				
+							
+
+						}
+
+					
+						$attackers.each(function (i) {
+							$(this).css({
+								'-webkit-transform-origin' : 'top center',
+								'-webkit-transform' : 'rotateZ('+(i * attackers_space)+'deg) translateY(16px)'
+							});	
+						}); 
+					
+
+					
+					
+
+				});*/
+
+			});
+		</script>
+	</body>
+</html>
